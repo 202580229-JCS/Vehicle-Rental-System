@@ -1,0 +1,120 @@
+import java.util.ArrayList;
+import java.util.List;
+
+class Vehicle {
+    protected String vehicleId;
+    protected String brand;
+    protected double dailyRate;
+
+    public Vehicle(String vehicleId, String brand, double dailyRate) {
+        this.vehicleId = vehicleId;
+        this.brand = brand;
+        this.dailyRate = dailyRate;
+    }
+
+    public double calculateRentalCost(int days) {
+        return dailyRate * days;
+    }
+
+    public void displayInfo() {
+        System.out.print("Vehicle [ID=" + vehicleId + ", Brand=" + brand + "]");
+    }
+
+    public String getBrand() {
+        return brand;
+    }
+}
+
+class Car extends Vehicle {
+    private int numSeats;
+
+    public Car(String vehicleId, String brand, double dailyRate, int numSeats) {
+        super(vehicleId, brand, dailyRate);
+        this.numSeats = numSeats;
+    }
+
+    @Override
+    public double calculateRentalCost(int days) {
+        double baseCost = super.calculateRentalCost(days);
+        return baseCost + (baseCost * 0.10);
+    }
+
+    @Override
+    public void displayInfo() {
+        System.out.print("Car [ID=" + vehicleId + ", Brand=" + brand + ", Seats=" + numSeats + "]");
+    }
+}
+
+class Motorcycle extends Vehicle {
+    private int engineCapacity;
+
+    public Motorcycle(String vehicleId, String brand, double dailyRate, int engineCapacity) {
+        super(vehicleId, brand, dailyRate);
+        this.engineCapacity = engineCapacity;
+    }
+
+    @Override
+    public double calculateRentalCost(int days) {
+        double baseCost = super.calculateRentalCost(days);
+        return baseCost - (baseCost * 0.05);
+    }
+
+    @Override
+    public void displayInfo() {
+        System.out.print("Motorcycle [ID=" + vehicleId + ", Brand=" + brand + ", CC=" + engineCapacity + "]");
+    }
+}
+
+class Customer {
+    private String name;
+    private String licenseNumber;
+    private Vehicle rentedVehicle;
+
+    public Customer(String name, String licenseNumber) {
+        this.name = name;
+        this.licenseNumber = licenseNumber;
+    }
+
+    public void rentVehicle(Vehicle v) {
+        rentedVehicle = v;
+    }
+
+    public void returnVehicle() {
+        rentedVehicle = null;
+    }
+
+    public void printRentalSummary(int days) {
+        System.out.println("Customer: " + name + " (License: " + licenseNumber + ")");
+
+        if (rentedVehicle == null) {
+            System.out.println("No vehicle rented.");
+        } else {
+            System.out.println("Rented: " + rentedVehicle.getBrand() + " "
+                    + rentedVehicle.getClass().getSimpleName());
+
+            double total = rentedVehicle.calculateRentalCost(days);
+            System.out.println("Total Cost for " + days + " days: $" + String.format("%.2f", total));
+        }
+    }
+}
+
+public class Main {
+    public static void main(String[] args) {
+        List<Vehicle> vehicles = new ArrayList<>();
+        vehicles.add(new Car("101", "Toyota", 100, 5));
+        vehicles.add(new Motorcycle("102", "Yamaha", 50, 150));
+
+        System.out.println("=== Vehicle Rental Costs ===");
+        for (Vehicle v : vehicles) {
+            v.displayInfo();
+            double cost = v.calculateRentalCost(3);
+            System.out.println(" -> Cost for 3 days: $" + String.format("%.2f", cost));
+        }
+
+        System.out.println();
+        System.out.println("=== Customer Rental Summary ===");
+        Customer alice = new Customer("Alice", "AB1234");
+        alice.rentVehicle(vehicles.get(0));
+        alice.printRentalSummary(5);
+    }
+}
